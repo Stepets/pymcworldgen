@@ -12,6 +12,7 @@ import os
 import subprocess
 import numpy
 import pymclevel as mcl
+import pymclevel.infiniteworld
 from scipy import *
 from pylab import *
 
@@ -52,11 +53,11 @@ def savechunkimage( chunk, name='randomchunk' ):
 def createWorld(name):
     worlddir = os.path.join( os.getcwd(), "renders", name )
     if ( os.path.exists( worlddir ) ):
-        print "World exists, deleting..."
+        print("World exists, deleting...")
         rm_rf(worlddir)
     os.mkdir( worlddir )
 
-    world = mcl.MCInfdevOldLevel( worlddir, create = True);
+    world = mcl.infiniteworld.MCInfdevOldLevel( worlddir, create = True);
 
     world.generateLights();
     world.setPlayerPosition( (0, 67, 0) ) # add 3 to make sure his head isn't in the ground.
@@ -83,10 +84,8 @@ def setWorldChunk(world, inchunk, cx, cz):
     global chunksBeforeNextSave
 
     assert( issubclass(inchunk.__class__, Chunk) )
-    arr = inchunk.blocks
-    assert( len(arr) == 16 )
-    assert( len(arr[0]) == 16 )
-    assert( len(arr[0][0]) == 128 )
+    arr = numpy.array(inchunk.blocks)
+    assert arr.shape == (16, 16, 128)
 
     if not world.containsChunk(cx, cz):
         world.createChunk(cx, cz)

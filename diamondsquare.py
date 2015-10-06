@@ -23,8 +23,8 @@ diamondsquare1D
 
 def diamondsquare1D( arr, seed = None, volatility = 0.5, initdepth = 0):
 
-    if not (0.0 <= volatility and volatility <= 1.0): raise Exception, 'volatility is out of bounds:' + str(volatility)
-    if not (0 <= initdepth): raise Exception, 'initdepth is out of bounds:' + str( initdepth)
+    if not (0.0 <= volatility and volatility <= 1.0): raise ValueError('volatility is out of bounds:' + str(volatility))
+    if not (0 <= initdepth): raise ValueError('initdepth is out of bounds:' + str( initdepth))
 
     """
     recurse:
@@ -92,8 +92,8 @@ diamondsquare2D
 
 def diamondsquare2D( arr, seed = None, volatility = 0.5, initdepth = 0):
        
-    if not (0.0 <= volatility and volatility <= 1.0): raise Exception, 'volatility is out of bounds:' + str(volatility)
-    if not (0 <= initdepth): raise Exception, 'initdepth is out of bounds:' + str( initdepth)
+    if not (0.0 <= volatility and volatility <= 1.0): raise ValueError('volatility is out of bounds:' + str(volatility))
+    if not (0 <= initdepth): raise ValueError('initdepth is out of bounds:' + str( initdepth))
 
     """
     recurse:

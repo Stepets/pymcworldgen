@@ -13,21 +13,21 @@ REGION_WIDTH_IN_CHUNKS = 32
 # Block ID constants
 try:
     from pymclevel import materials
-    MAT_AIR = materials.materials.Air.ID
-    MAT_STONE = materials.materials.Stone.ID
-    MAT_DIRT = materials.materials.Dirt.ID
-    MAT_WOOD = materials.materials.Wood.ID
-    MAT_WATER = materials.materials.WaterActive.ID
-    MAT_SNOW = materials.materials.Snow.ID
-    MAT_BEDROCK = materials.materials.Bedrock.ID
-    MAT_LEAVES = materials.materials.Leaves.ID
-    MAT_GRASS = materials.materials.Grass.ID
-    MAT_DIAMONDORE = materials.materials.DiamondOre.ID
-    MAT_REDSTONEORE = materials.materials.RedstoneOre.ID
-    MAT_LAPISORE = materials.materials.LapisLazuliOre.ID
-    MAT_GOLDORE = materials.materials.GoldOre.ID
-    MAT_IRONORE = materials.materials.IronOre.ID
-    MAT_COALORE = materials.materials.CoalOre.ID
+    MAT_AIR = materials.alphaMaterials.Air.ID
+    MAT_STONE = materials.alphaMaterials.Stone.ID
+    MAT_DIRT = materials.alphaMaterials.Dirt.ID
+    MAT_WOOD = materials.alphaMaterials.Wood.ID
+    MAT_WATER = materials.alphaMaterials.WaterActive.ID
+    MAT_SNOW = materials.alphaMaterials.Snow.ID
+    MAT_BEDROCK = materials.alphaMaterials.Bedrock.ID
+    MAT_LEAVES = materials.alphaMaterials.Leaves.ID
+    MAT_GRASS = materials.alphaMaterials.Grass.ID
+    MAT_DIAMONDORE = materials.alphaMaterials.DiamondOre.ID
+    MAT_REDSTONEORE = materials.alphaMaterials.RedstoneOre.ID
+    MAT_LAPISORE = materials.alphaMaterials.LapisLazuliOre.ID
+    MAT_GOLDORE = materials.alphaMaterials.GoldOre.ID
+    MAT_IRONORE = materials.alphaMaterials.IronOre.ID
+    MAT_COALORE = materials.alphaMaterials.CoalOre.ID
 except ImportError:
     MAT_AIR = 0
     MAT_STONE = 1

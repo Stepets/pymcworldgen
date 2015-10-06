@@ -76,12 +76,11 @@ class Landmark(Filter):
     def findHighestGround(self, airid = MAT_AIR):
         # Find our actual Y at the x,z spawn coordinates.
         # but before that, we need the correct chunk.
-        originchunkx = self.x / CHUNK_WIDTH_IN_BLOCKS
-        originchunkz = self.z / CHUNK_WIDTH_IN_BLOCKS
+        originchunkx = self.x // CHUNK_WIDTH_IN_BLOCKS
+        originchunkz = self.z // CHUNK_WIDTH_IN_BLOCKS
         originchunk = self.inputlayer.getChunk(originchunkx, originchunkz).blocks
         # now that we have the correct origin chunk, let's search for the tree's ground height.
-        downrange = range( 0, CHUNK_HEIGHT_IN_BLOCKS - 1 )
-        downrange.reverse()
+        downrange = range( CHUNK_HEIGHT_IN_BLOCKS - 1, 0, -1)
         actualy = None
         actualyid = None
         chunkoffsetx = self.x % CHUNK_WIDTH_IN_BLOCKS
@@ -107,12 +106,12 @@ class Landmark(Filter):
         # offsets of lower north-east corner of the array relative to corner block.
 
         # iterate between the overlapping range, in chunk-space.
-        for outx in xrange( max(0, offsetx), min(CHUNK_WIDTH_IN_BLOCKS, offsetx + len(inputstamp) ) ):
+        for outx in range( max(0, offsetx), min(CHUNK_WIDTH_IN_BLOCKS, offsetx + len(inputstamp) ) ):
             # get the current coordinate in input-space.
             inx = outx - offsetx
-            for outz in xrange( max(0, offsetz), min(CHUNK_WIDTH_IN_BLOCKS, offsetz + len(inputstamp[inx]) ) ):
+            for outz in range( max(0, offsetz), min(CHUNK_WIDTH_IN_BLOCKS, offsetz + len(inputstamp[inx]) ) ):
                 inz = outz - offsetz
-                for outy in xrange( max(0, offsety), min(CHUNK_HEIGHT_IN_BLOCKS, offsety + len(inputstamp[inx][inz]) ) ):
+                for outy in range( max(0, offsety), min(CHUNK_HEIGHT_IN_BLOCKS, offsety + len(inputstamp[inx][inz]) ) ):
                     iny = outy - offsety
                     if (inputstamp[inx][inz][iny] != MAT_TRANSPARENT):
                         outputchunk[outx][outz][outy] = inputstamp[inx][inz][iny]
@@ -130,7 +129,7 @@ class Landmark(Filter):
         relz = self.z - cornerblockz
         # only place this down if we're not going to overflow the array
         if ( 0 <= relx < CHUNK_WIDTH_IN_BLOCKS ) and ( 0 <= relz < CHUNK_WIDTH_IN_BLOCKS ):
-            for i in xrange(CHUNK_HEIGHT_IN_BLOCKS):
+            for i in range(CHUNK_HEIGHT_IN_BLOCKS):
                 terrainblocks[relx][relz][i] = MAT_WOOD
             terrainblocks[relx][relz][self.y] = MAT_WATER
         
@@ -164,7 +163,7 @@ class LandmarkGenerator(Filter):
     def __init__(self, inputlayer, seed, landmarklist = [Landmark], density = 200, layermask = None, rangebottom = 0, rangetop = CHUNK_HEIGHT_IN_BLOCKS):
         # Input landmark list needs to be doublechecked.
         for lmtype in landmarklist:
-            if not issubclass(type(lmtype), Landmark): raise TypeError, "landmarklist must only contain Landmark objects."
+            if not issubclass(type(lmtype), Landmark): raise TypeError("landmarklist must only contain Landmark objects.")
         # We need to enforce that a cachefilter is placed before the handmark generator, for performance purposes.
         if not issubclass(type(inputlayer), CacheFilter):
             #print "LandmarkGenerator works much faster with a cachefilter at its input, since it requests chunks multiple times."
@@ -185,14 +184,14 @@ class LandmarkGenerator(Filter):
         mvr = 0
         for lmtype in self.landmarklist:
             if lmtype.viewrange > mvr: mvr = lmtype.viewrange
-        return mvr
+        return int(mvr)
 
     def getSpawnsInRegion(self, rx, rz):
         # Generate each spawn point and store in regionspawns, otherwise we just get the cached spawnpoints.
         if not (rx, rz) in self.worldspawns:
             # Seed the random number gen with all 64 bits of region coordinate data by using both seed and jumpahead
             random.seed( self.seed ^ ((rx & 0xFFFF0000) | (rz & 0x0000FFFF)) )
-            random.jumpahead( ((rx & 0xFFFF0000) | (rz & 0x0000FFFF)) ) 
+            # random.jumpahead( ((rx & 0xFFFF0000) | (rz & 0x0000FFFF)) ) [alexjc] 
             # First number should be number of points in region
             numspawns = self.density
             rangetop = self.rangetop
@@ -200,12 +199,12 @@ class LandmarkGenerator(Filter):
 
             self.worldspawns[ (rx,rz) ] = {}
             currentregion = self.worldspawns[ (rx,rz) ]
-            for ix in xrange(numspawns):
+            for ix in range(numspawns):
                 blockx = random.randint( 0, CHUNK_WIDTH_IN_BLOCKS * REGION_WIDTH_IN_CHUNKS - 1 ) + rx * CHUNK_WIDTH_IN_BLOCKS * REGION_WIDTH_IN_CHUNKS
                 blockz = random.randint( 0, CHUNK_WIDTH_IN_BLOCKS * REGION_WIDTH_IN_CHUNKS - 1 ) + rz * CHUNK_WIDTH_IN_BLOCKS * REGION_WIDTH_IN_CHUNKS
                 blocky = random.randint( max(0, rangebottom), min(CHUNK_HEIGHT_IN_BLOCKS - 1, rangetop) ) 
-                currchunkx = blockx / CHUNK_WIDTH_IN_BLOCKS
-                currchunkz = blockz / CHUNK_WIDTH_IN_BLOCKS
+                currchunkx = blockx // CHUNK_WIDTH_IN_BLOCKS
+                currchunkz = blockz // CHUNK_WIDTH_IN_BLOCKS
                 # We store the points for each chunk indexed by chunk
                 if not (currchunkx, currchunkz) in currentregion:
                     currentregion[ (currchunkx, currchunkz) ] = []
@@ -224,8 +223,8 @@ class LandmarkGenerator(Filter):
         """
         Gets the spawn points for the selected chunk (reading from the appropriate region cache) 
         """
-        rx = cx / REGION_WIDTH_IN_CHUNKS
-        rz = cz / REGION_WIDTH_IN_CHUNKS
+        rx = cx // REGION_WIDTH_IN_CHUNKS
+        rz = cz // REGION_WIDTH_IN_CHUNKS
         regionspawns = self.getSpawnsInRegion(rx, rz)
         if (cx, cz) in regionspawns:
             return regionspawns[ (cx,cz) ]
@@ -240,10 +239,10 @@ class LandmarkGenerator(Filter):
         can check on its own whether it's within rendering range of the chunk.
         """
         mvr = self.getMaxViewRange()
-        chunkviewrange = (mvr + CHUNK_WIDTH_IN_BLOCKS - 1) / CHUNK_WIDTH_IN_BLOCKS # ceiling div
+        chunkviewrange = (mvr + CHUNK_WIDTH_IN_BLOCKS - 1) // CHUNK_WIDTH_IN_BLOCKS # ceiling div
         spawnlist = []
-        for chunkrow in xrange( cx - chunkviewrange, cx + chunkviewrange + 1):
-            for chunkcol in xrange( cz - chunkviewrange, cz + chunkviewrange + 1):
+        for chunkrow in range( cx - chunkviewrange, cx + chunkviewrange + 1):
+            for chunkcol in range( cz - chunkviewrange, cz + chunkviewrange + 1):
                 chunkspawns = self.getSpawnsInChunk( chunkrow, chunkcol )
                 if chunkspawns != None: spawnlist.extend( chunkspawns )
         return spawnlist
@@ -306,7 +305,7 @@ class StaticTreeLandmark(Landmark):
                     [MAT_TRANSPARENT, MAT_TRANSPARENT, MAT_TRANSPARENT, MAT_LEAVES, MAT_TRANSPARENT, MAT_TRANSPARENT]]
                     ]
 
-    viewrange = max( len(statictree), len(statictree[0]) ) / 2
+    viewrange = max( len(statictree), len(statictree[0]) ) // 2
 
     """
     """
@@ -359,13 +358,13 @@ class CubicOreLandmark(Landmark):
         Edit the input chunk and add ores.
         """
         if self.stamp == None:
-            self.stamp = [[[MAT_TRANSPARENT for vert in xrange(self.sizey)] for col in xrange(self.sizez)] for row in xrange(self.sizex)]
+            self.stamp = [[[MAT_TRANSPARENT for vert in range(self.sizey)] for col in range(self.sizez)] for row in range(self.sizex)]
             # Add shit to the stamp here!
             random.seed( self.seed ^ (( (self.x << 16) & 0xFFFF0000) | ( self.z & 0x0000FFFF)) )
-            random.jumpahead( self.y )
+            # random.jumpahead( self.y ) [alexjc]
             for row in self.stamp:
                 for col in row:
-                    for ix in xrange(len(col)) :
+                    for ix in range(len(col)) :
                         if random.random() < self.density:
                             col[ix] = self.ore
         offsetx = self.x - cornerblockx
