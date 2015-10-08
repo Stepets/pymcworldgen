@@ -43,10 +43,9 @@ def namedModule(name):
 random.seed()
 
 def filtertest(modulename="default"):
-
     totaltime = 0
 
-    testworld = createWorld("nuclai")
+    testworld = createWorld("nuclai.world")
     # cool seeds: 12397
     worldseed = random.randint(0, 65535)
     worldsizex = 8
@@ -54,12 +53,11 @@ def filtertest(modulename="default"):
     print("World seed is", worldseed)
     
     pipeline = namedModule(modulename)
-    print(pipeline, dir(pipeline))
     tfilter = pipeline.build(worldseed, testworld)
 
     # Generate minecraft level
     for chunkrow in range(-worldsizex, worldsizex):
-        print("Generating westward chunk strip", chunkrow)
+        print("Generating chunk ", chunkrow)
 
         for chunkcol in range(-worldsizez, worldsizez):
             #print "\n========\nChunk", (chunkrow, chunkcol), "\n========"   
@@ -72,14 +70,12 @@ def filtertest(modulename="default"):
     
     saveWorld(testworld)
     # renderWorld("testworld", "testworld-"+str(worldseed)+"-"+str(worldsizex*2)+"x"+str(worldsizez*2))
-    print("World seed is", worldseed)
 
     print("Processing took", totaltime, "seconds.")
 
 if __name__ == "__main__":
-   
-    if not os.path.isdir("renders"):
-        os.mkdir("renders")
+    if not os.path.isdir("output"):
+        os.mkdir("output")
     
     if len(sys.argv)>1:
         filtertest(sys.argv[1])
@@ -87,5 +83,4 @@ if __name__ == "__main__":
         filtertest()
     
     print("Generation complete.")
-
 

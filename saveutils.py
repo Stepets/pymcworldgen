@@ -13,8 +13,8 @@ import subprocess
 import numpy
 import pymclevel as mcl
 import pymclevel.infiniteworld
-from scipy import *
-from pylab import *
+# from scipy import *
+# from pylab import *
 
 from layer import Chunk
 
@@ -38,7 +38,7 @@ def saveedgeimage( edge, name='randomedge' ):
     ylabel('height')
     title(name)
     grid(True)
-    savefig(os.path.join("renders", name) )
+    savefig(os.path.join("output", name))
 
 def savechunkimage( chunk, name='randomchunk' ):
     hold(False)
@@ -48,10 +48,10 @@ def savechunkimage( chunk, name='randomchunk' ):
     xlabel('x (positive is south)')
     ylabel('z (positive is west)')
     title(name)
-    savefig(os.path.join("renders", name))
+    savefig(os.path.join("output", name))
 
 def createWorld(name):
-    worlddir = os.path.join( os.getcwd(), "renders", name )
+    worlddir = os.path.join("output", name )
     if ( os.path.exists( worlddir ) ):
         print("World exists, deleting...")
         rm_rf(worlddir)
@@ -71,7 +71,7 @@ def saveWorld(world):
 
 def renderWorld(worldname, filename):
     # take a c10t snapshot!
-    subprocess.call(["./c10t/c10t", "-w", "./renders/" + worldname, "-o", "./renders/" + filename + ".png", "--oblique-angle" ])    
+    subprocess.call(["./c10t/c10t", "-w", "output/" + worldname, "-o", "output/" + filename + ".png", "--oblique-angle" ])    
 
 def getWorldChunk(world, cx, cz):
     if not world.containsChunk(cx, cz):
