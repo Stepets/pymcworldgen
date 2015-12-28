@@ -129,8 +129,6 @@ class Landmark(Filter):
         relz = self.z - cornerblockz
         # only place this down if we're not going to overflow the array
         if ( 0 <= relx < CHUNK_WIDTH_IN_BLOCKS ) and ( 0 <= relz < CHUNK_WIDTH_IN_BLOCKS ):
-            for i in range(CHUNK_HEIGHT_IN_BLOCKS):
-                terrainblocks[relx][relz][i] = MAT_WOOD
             terrainblocks[relx][relz][self.y] = MAT_WATER
         
     def getChunk(self, cx, cz):

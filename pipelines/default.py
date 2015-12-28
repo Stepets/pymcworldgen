@@ -18,21 +18,22 @@ from saveutils import *
 
 def build(worldseed, worldobj):
     roughterrain = DSLayerMask2d(worldseed,
-                            chunkvolatility = 0.25, 
-                            regionvolatility = 0.8, 
-                            chunkinitdepth = 1 ) # Terrain height generation
+                            chunkvolatility = 0,
+                            regionvolatility = 1,
+                            chunkinitdepth = 2) # Terrain height generation
 
     smoothterrain = DSLayerMask2d(worldseed + 1234,
-                            chunkvolatility = 0.15, 
-                            regionvolatility = 0.5, 
+                            chunkvolatility = 0.1,
+                            regionvolatility = 1,
                             chunkinitdepth = 1 ) # Smooth terrain
 
     terrainblendmask = DSLayerMask2d(worldseed + 5678,
-                            chunkvolatility = 0.0, 
-                            regionvolatility = 0.5, 
+                            chunkvolatility = 0.3,
+                            regionvolatility = 1,
                             chunkinitdepth = 1 ) # Smooth terrain
 
     terrain = BlendMaskFilter2d( roughterrain, smoothterrain, alphamask = terrainblendmask)
+    terrain = SmoothFilter2d(terrain, 0.55)
 
 
     tfilter = HeightMaskRenderFilter(terrain,
@@ -51,14 +52,15 @@ def build(worldseed, worldobj):
 
     tfilter = Filter(tfilter) # passthru filter
     tfilter = TopSoilFilter(tfilter, 
-                            rangetop = 85, thickness = 5,
+                            rangetop = 85, thickness = 3,
                             findid = worldobj.materials.Stone.ID,
                             replaceid = MAT_DIRT) # Replace top rock with dirt
-    tfilter = WaterLevelFilter(tfilter,
-                            rangebottom = 61, rangetop = 66,
-                            findid = worldobj.materials.Dirt.ID,
-                            replaceid = worldobj.materials.Sand.ID) # replace dirt with sandy shores 
+    # tfilter = WaterLevelFilter(tfilter,
+    #                         rangebottom = 61, rangetop = 66,
+    #                         findid = worldobj.materials.Dirt.ID,
+    #                         replaceid = worldobj.materials.Sand.ID) # replace dirt with sandy shores
     tfilter = WaterLevelFilter(tfilter) # water level at 64
+    tfilter = CorrosionFilter(tfilter)
     tfilter = TopSoilFilter(tfilter, 
                             rangetop = 84, thickness = 1, 
                             findid = worldobj.materials.Dirt.ID,
@@ -70,8 +72,9 @@ def build(worldseed, worldobj):
     tfilter = LandmarkGenerator(tfilter, worldseed, landmarklist = [StaticTreeLandmark(None)], density = 2500)
 
     tfilter = SnowCoverFilter(tfilter, 
-                            rangebottom = 82, 
+                            rangebottom = 64 + 20,
                             rangetop = 64 + 30 + 1,
-                            thickness = 1, 
+                            thickness = 1,
                             snowid = worldobj.materials.Snow.ID) # Cake snow on top of stuff
+
     return tfilter
